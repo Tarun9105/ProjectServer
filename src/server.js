@@ -23,7 +23,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8081',
+  origin: process.env.FRONTEND_URL || 'https://tarun9105.github.io/ProjectUI/',
   credentials: true
 }));
 
@@ -40,18 +40,25 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/donation-centers', donationCenterRoutes);
 
-
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
-// Serve static assets in production
+// For production environment
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../frontend')));
-  
+  // Instead of serving static files, redirect non-API requests to GitHub Pages
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../../frontend', 'index.html'));
+    // Only redirect requests that aren't for the API or health check
+    if (!req.path.startsWith('/api/') && req.path !== '/health') {
+      const githubPagesUrl = process.env.FRONTEND_URL || 'https://tarun9105.github.io/ProjectUI/';
+      // Remove trailing slash if it exists to avoid double slashes
+      const baseUrl = githubPagesUrl.endsWith('/') ? githubPagesUrl.slice(0, -1) : githubPagesUrl;
+      res.redirect(`${baseUrl}${req.path}`);
+    } else {
+      // This will trigger the 404 handler for API routes that don't exist
+      res.status(404).json({ message: 'API endpoint not found' });
+    }
   });
 }
 
@@ -80,4 +87,4 @@ mongoose.connect(process.env.MONGODB_URI, {
     process.exit(1);
   });
 
-  module.exports = app;
+module.exports = app;
