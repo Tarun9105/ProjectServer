@@ -26,8 +26,12 @@ app.set('trust proxy', 1);
 
 // Middleware
 app.use(express.json());
+// app.use(cors({
+//   origin: ['https://tarun9105.github.io', 'https://tarun9105.github.io/ProjectUI/'],
+//   credentials: true
+// }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://tarun9105.github.io/ProjectUI/' ||'https://tarun9105.github.io' ,
+  origin: ['https://bloodconnecttarun.netlify.app', 'https://tarun9105.github.io/ProjectUI'],
   credentials: true
 }));
 
